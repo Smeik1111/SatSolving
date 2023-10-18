@@ -1,3 +1,6 @@
+# Anzahl variablen = n
+# Klauseln = (Anzahl der pyth. Triple) * 2 
+
 from pysat.solvers import Glucose3
 import math
 n=1000
