@@ -4,8 +4,6 @@ from pprint import pprint
 
 #bin 0=>var-1   bin 1=>var1
 
-import_str = "./sudokus/puzzle05a.sudoku"
-
 #example 03b:
 #unoptimized:
 #duplicates: 7290
@@ -18,6 +16,20 @@ import_str = "./sudokus/puzzle05a.sudoku"
 #skip square clause if number from import:
 #duplicates: 3690
 #clauses: 11191
+#
+#example 04a:
+#duplicates: 25808
+#clauses: 71042
+#
+#example 05a:
+#duplicates: 114900
+#clauses: 377275
+
+#import os
+#cwd = os.getcwd()
+#print(cwd)
+import_str = "./py-satsolver/sudokus/puzzle05a.sudoku"
+
 
 def is_valid_sudoku(board, k):
     def has_duplicates(arr):
@@ -66,19 +78,20 @@ def pos_to_index(tuple):
     return tuple[0]*n+tuple[1]
 
 def prettyprint(board, k):
-    maxlen = 3
+    maxlen = len(str(k*k))+1
+    minus_multiplicator = int(3)
     for row in range(0,k*k):
         if row%k == 0:
-            print("-"*(k*k*2+4))
+            print("-"*(k*k*minus_multiplicator))
         temp = '|'
         for column in range(0,k*k):
             temp+=' ' * (maxlen - len(str(board[(row,column)]))) + str(board[(row,column)])
             if column % k == k-1:
                 temp+='|'
         print(str(temp))
-    print("-"*(k*k*2+4))
+    print("-"*(k*k*minus_multiplicator))
 
-
+print('')
 with open(import_str, "r") as file:
     content = file.read().split()
 if content is None:
@@ -89,6 +102,8 @@ board = dict()
 for row in range(0, n):
     for column in range(0, n):
         board[(row,column)] = int(content[pos_to_index((row,column))])
+
+prettyprint(board, k)
 
 clauses = []
 #unallowed numbers
@@ -140,8 +155,6 @@ for clause in clauses:
     else:
         duplicates += 1
 print("removed "+ str(duplicates)+ " duplicate clauses")
-
-prettyprint(board, k)
 
 g = Glucose3()
 for clause in deduplicate:
