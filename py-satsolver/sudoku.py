@@ -1,5 +1,5 @@
+import time
 from pysat.solvers import Glucose3
-import math
 from pprint import pprint
 
 #bin 0=>var-1   bin 1=>var1
@@ -16,20 +16,23 @@ from pprint import pprint
 #skip square clause if number from import:
 #duplicates: 3690
 #clauses: 11191
+#time: 0.17943358421325684
 #
 #example 04a:
 #duplicates: 25808
 #clauses: 71042
+#time: 2.9506070613861084
 #
 #example 05a:
 #duplicates: 114900
 #clauses: 377275
+#time: 44.6932110786438
 
 #import os
 #cwd = os.getcwd()
 #print(cwd)
-import_str = "./py-satsolver/sudokus/puzzle05a.sudoku"
-
+import_str = "./py-satsolver/sudokus/puzzle03a.sudoku"
+print(import_str.split('/')[-1])
 
 def is_valid_sudoku(board, k):
     def has_duplicates(arr):
@@ -92,6 +95,7 @@ def prettyprint(board, k):
     print("-"*(k*k*minus_multiplicator))
 
 print('')
+start_time =time.time()
 with open(import_str, "r") as file:
     content = file.read().split()
 if content is None:
@@ -170,4 +174,6 @@ board_solved = model_to_board(model, n)
 prettyprint(board_solved, k)
 
 print("Is this Board valid?: "+str(is_valid_sudoku(board_solved, k)))
+end_time = time.time()
+print(f"Elapsed time: {end_time-start_time} seconds")
 
