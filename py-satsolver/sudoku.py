@@ -31,7 +31,7 @@ from pprint import pprint
 # import os
 # cwd = os.getcwd()
 # print(cwd)
-import_str = "./py-satsolver/sudokus/puzzle03a.sudoku"
+import_str = "./py-satsolver/sudokus/puzzle04a.sudoku"
 print(import_str.split('/')[-1])
 
 
@@ -67,6 +67,8 @@ def model_to_board(model, n):
               int(index/n.bit_length() % n)] = number
     return board
 
+def pos_to_bool_representation(tuple_in, value, n):
+    return index_value_to_bool_representation(pos_to_index(tuple_in), value, n)
 
 def index_value_to_bool_representation(index, value, n):
     number_of_bits_for_all_numbers = n.bit_length()
@@ -102,7 +104,6 @@ def prettyprint(board, k):
         print(str(temp))
     print("-"*(k*k*minus_multiplicator))
 
-
 print('')
 start_time = time.time()
 with open(import_str, "r") as file:
@@ -134,25 +135,28 @@ for row in range(0, n):
         if board[(row, column)] != 0:
             for possible_number in range(1, n+1):
                 if possible_number != board[(row, column)]:
-                    clauses.append(index_value_to_bool_representation(
-                        pos_to_index((row, column)), possible_number, n))
+                    clauses.append(pos_to_bool_representation(
+                        (row, column), possible_number, n))
         else:
             # rows and columns
-            for other in range(0, n):
-                for possible_number in range(1, n+1):
-                    # rows
+            for possible_number in range(1, n+1):
+                # rows
+                for other in range(0, n):
+                #for other in range(row+1, n):
                     if other != column:
-                        clause = index_value_to_bool_representation(
-                            pos_to_index((row, column)), possible_number, n)
-                        clause += index_value_to_bool_representation(
-                            pos_to_index((row, other)), possible_number, n)
+                    #if row != n-1:
+                        clause = pos_to_bool_representation(
+                            (row, column), possible_number, n)
+                        clause += pos_to_bool_representation(
+                            (row, other), possible_number, n)
                         clauses.append(clause)
-                    # columns
+                # columns
+                for other in range(0, n):
                     if other != row:
-                        clause = index_value_to_bool_representation(
-                            pos_to_index((row, column)), possible_number, n)
-                        clause += index_value_to_bool_representation(
-                            pos_to_index((other, column)), possible_number, n)
+                        clause = pos_to_bool_representation(
+                            (row, column), possible_number, n)
+                        clause += pos_to_bool_representation(
+                            (other, column), possible_number, n)
                         clauses.append(clause)
             # squares
             square_corner = (int(row/k)*k, int(column/k)*k)
@@ -160,12 +164,11 @@ for row in range(0, n):
                 for other_column in range(square_corner[1], square_corner[1]+k):
                     for possible_number in range(1, n+1):
                         if other_row != row and other_column != column:
-                            clause = index_value_to_bool_representation(
-                                pos_to_index((row, column)), possible_number, n)
-                            clause += index_value_to_bool_representation(
-                                pos_to_index((other_row, other_column)), possible_number, n)
+                            clause = pos_to_bool_representation(
+                                (row, column), possible_number, n)
+                            clause += pos_to_bool_representation(
+                                (other_row, other_column), possible_number, n)
                             clauses.append(clause)
-
 deduplicate, duplicates = set(), 0
 for clause in clauses:
     clause.sort()
@@ -175,6 +178,7 @@ for clause in clauses:
     else:
         duplicates += 1
 print("removed " + str(duplicates) + " duplicate clauses")
+pprint(clauses[2])
 
 g = Glucose3()
 for clause in deduplicate:
